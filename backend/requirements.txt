@@ -1,3 +1,5 @@
 fastapi
 uvicorn[standard]
 fastapi-cors
+sqlalchemy
+aiosqlite

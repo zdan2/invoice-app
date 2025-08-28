@@ -1,64 +1,59 @@
 <template>
   <div>
     <h1>請求書管理アプリ 🧾</h1>
-    <button @click="fetchMessage">バックエンドに接続テスト</button>
-    <p v-if="message">バックエンドからの返事 👉 {{ message }}</p>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>提出者名</th>
+          <th>ファイル名</th>
+          <th>提出日時</th>
+          <th>ステータス</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="invoice in invoices" :key="invoice.id">
+          <td>{{ invoice.id }}</td>
+          <td>{{ invoice.client_name }}</td>
+          <td>{{ invoice.file_name }}</td>
+          <td>{{ invoice.uploaded_at }}</td>
+          <td>
+            <span :class="`status-${invoice.status}`">{{ invoice.status }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
     <p v-if="error" style="color: red;">{{ error }}</p>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+// ... <script>部分は変更なし ...
+import { ref, onMounted } from 'vue'
 
-// バックエンドからのメッセージを保持する場所
-const message = ref('')
+const invoices = ref([])
 const error = ref('')
 
-// バックエンドにデータを要求する関数
-const fetchMessage = async () => {
+const fetchInvoices = async () => {
   try {
-    // バックエンドのAPI (http://localhost:8000/) を呼び出す
-    const response = await fetch('http://localhost:8000/')
+    const response = await fetch('http://localhost:8000/invoices')
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
-    const data = await response.json()
-    message.value = data
-    error.value = '' // エラーがなければクリア
+    invoices.value = await response.json()
   } catch (e) {
     console.error(e)
-    error.value = '接続に失敗しました。バックエンドのコンテナは起動していますか？'
-    message.value = '' // メッセージをクリア
+    error.value = 'データの取得に失敗しました。'
   }
 }
+
+onMounted(() => {
+  fetchInvoices()
+})
 </script>
 
 <style>
-/* 簡単なスタイルで見栄えを良くする */
-body {
-  font-family: sans-serif;
-  padding: 2em;
-  background-color: #f4f7f6;
-}
-div {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2em;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-button {
-  padding: 10px 15px;
-  font-size: 16px;
-  cursor: pointer;
-  background-color: #4CAF50; /* Green */
-  color: white;
-  border: none;
-  border-radius: 5px;
-}
-p {
-  margin-top: 20px;
-  font-size: 18px;
-}
+/* ... <style>部分は変更なし ... */
 </style>
