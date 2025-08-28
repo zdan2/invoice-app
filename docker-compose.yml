@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  # バックエンドサービスの設定
+  backend:
+    build: ./backend  # ./backend フォルダのDockerfileを使う
+    ports:
+      - "8000:8000"  # PCの8000番とコンテナの8000番を繋ぐ
+    volumes:
+      - ./backend:/app # PCのbackendフォルダとコンテナの/appを同期させる
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+  # フロントエンドサービスの設定
+  frontend:
+    platform: linux/amd64
+    build: ./frontend # ./frontend フォルダのDockerfileを使う
+    ports:
+      - "3000:3000"  # PCの3000番とコンテナの3000番を繋ぐ
+    volumes:
+      - ./frontend:/app # PCのfrontendフォルダとコンテナの/appを同期させる
+      - /app/node_modules # ← この行を追加！
+    # tty: true は不要になるので消すかコメントアウト
+    # ↓↓↓ Nuxt開発サーバーを起動する命令を追加！ ↓↓↓
+    command: npm run dev -- --host
